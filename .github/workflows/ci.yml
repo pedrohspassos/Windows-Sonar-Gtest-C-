@@ -1,8 +1,8 @@
-name: C++ CI com cobertura (gcovr)
+name: C++ CI com cobertura
 
 on:
   push:
-    branches: [ workflow_teste_02 ]   # Ajuste para sua branch de testes
+    branches: [ workflow_teste_02 ]
 
 
 jobs:
@@ -10,47 +10,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout do código
-        uses: actions/checkout@v3
+    - uses: actions/checkout@v3
 
-      - name: Instalar dependências
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y cmake g++ gcovr
+    - name: Configurar CMake
+      run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
 
-      - name: Limpar build
-        run: rm -rf build && mkdir build
+    - name: Build
+      run: cmake --build build
 
-      - name: Rodar CMake com flags de cobertura
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
+    - name: Rodar testes
+      run: ctest --test-dir build --output-on-failure
 
-      - name: Compilar projeto
-        run: cmake --build build
+    - name: Gerar cobertura via alvo do CMake
+      run: cmake --build build --target coverage
 
-      - name: Rodar testes
-        run: cd build && ctest --output-on-failure
-
-      - name: Gerar relatório XML com gcovr
-        run: |
-            cd build
-            gcovr -r .. \
-              --exclude '.*_deps/.*' \
-              --exclude '.*main\.cpp' \
-              --xml-pretty -o coverage.xml
-
-      - name: Gerar relatório HTML com gcovr
-        run: |
-          cd build
-          gcovr -r .. \
-            --exclude '.*_deps/.*' \
-            --exclude '.*main\.cpp' \
-            --html --html-details -o coverage.html
-
-
-      - name: Upload do relatório como artefato
-        uses: actions/upload-artifact@v4
-        with:
-          name: gcovr-coverage-report
-          path: |
-            build/coverage.html
-            build/coverage.xml
+    - name: Upload dos relatórios de cobertura como artefato
+      uses: actions/upload-artifact@v4
+      with:
+        name: cobertura-gcovr
+        path: |
+          build/coverage.html
+          build/coverage.xml
