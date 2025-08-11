@@ -13,6 +13,11 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 set(CMAKE_CXX_STANDARD 11)
+# Flags para cobertura de testes
+if(CMAKE_COMPILER_IS_GNUCXX)
+    add_compile_options(--coverage)
+    link_libraries(--coverage)
+endif()
 
 include_directories(include)
 
