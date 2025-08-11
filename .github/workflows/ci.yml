@@ -2,7 +2,7 @@ name: C++ CI com cobertura
 
 on:
   push:
-    branches: [ workflow_teste ]
+    branches: [ workflow_teste ]   # Troque pela sua branch de teste
 
 jobs:
   build-and-test:
@@ -17,8 +17,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y cmake g++ lcov
 
-      - name: Criar pasta de build
-        run: mkdir build
+      - name: Limpar build anterior
+        run: rm -rf build && mkdir build
 
       - name: Rodar CMake com cobertura
         run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
@@ -39,7 +39,7 @@ jobs:
       - name: Gerar HTML do relatório de cobertura
         run: |
           cd build
-          genhtml coverage.info --output-directory coverage-html
+          genhtml coverage.info --output-directory coverage-html --ignore-errors mismatch
 
       - name: Upload do relatório como artefato
         uses: actions/upload-artifact@v4
