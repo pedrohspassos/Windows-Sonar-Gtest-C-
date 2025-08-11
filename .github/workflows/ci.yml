@@ -2,9 +2,8 @@ name: C++ CI com cobertura (gcovr)
 
 on:
   push:
-    branches: [ test-ci ]   # Ajuste para sua branch de testes
-  pull_request:
-    branches: [ test-ci ]
+    branches: [ workflow_teste ]   # Ajuste para sua branch de testes
+
 
 jobs:
   build-and-test:
