@@ -2,7 +2,7 @@ name: C++ CI com cobertura (gcovr)
 
 on:
   push:
-    branches: [ workflow_teste ]   # Ajuste para sua branch de testes
+    branches: [ workflow_teste_02 ]   # Ajuste para sua branch de testes
 
 
 jobs:
@@ -32,13 +32,20 @@ jobs:
 
       - name: Gerar relatório XML com gcovr
         run: |
-          cd build
-          gcovr -r .. --xml-pretty -o coverage.xml
+            cd build
+            gcovr -r .. \
+              --exclude '.*_deps/.*' \
+              --exclude '.*main\.cpp' \
+              --xml-pretty -o coverage.xml
 
       - name: Gerar relatório HTML com gcovr
         run: |
           cd build
-          gcovr -r .. --html --html-details -o coverage.html
+          gcovr -r .. \
+            --exclude '.*_deps/.*' \
+            --exclude '.*main\.cpp' \
+            --html --html-details -o coverage.html
+
 
       - name: Upload do relatório como artefato
         uses: actions/upload-artifact@v4
