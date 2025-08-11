@@ -5,29 +5,33 @@ project(Calculator)
 # GoogleTest integration
 include(FetchContent)
 FetchContent_Declare(
-	googletest
-	URL https://github.com/google/googletest/archive/refs/heads/main.zip
+    googletest
+    URL https://github.com/google/googletest/archive/refs/heads/main.zip
 )
-# For Windows: Prevent overriding the parent project's compiler/linker settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 set(CMAKE_CXX_STANDARD 11)
-# Flags para cobertura de testes
-if(CMAKE_COMPILER_IS_GNUCXX)
+
+# Adiciona flags de cobertura apenas para GCC/Clang
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     add_compile_options(--coverage)
-    link_libraries(--coverage)
+    set(COVERAGE_LIBS --coverage)
 endif()
 
 include_directories(include)
 
+# Alvo da biblioteca
 add_library(calculator src/calculator.cpp)
+
+# Executável principal
 add_executable(main src/main.cpp)
-target_link_libraries(main calculator)
+target_link_libraries(main calculator ${COVERAGE_LIBS})
 
+# Executável de teste
 add_executable(test_calculator tests/test_calculator.cpp)
+target_link_libraries(test_calculator calculator gtest_main ${COVERAGE_LIBS})
 
-target_link_libraries(test_calculator calculator gtest_main)
-
+# Testes
 enable_testing()
 add_test(NAME CalculatorTests COMMAND test_calculator)
