@@ -1,0 +1,28 @@
+name: C++ CI - Main
+
+on:
+  push:
+    branches: [ workflow_teste ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v3
+
+      - name: Instalar dependências
+        run: sudo apt-get update && sudo apt-get install -y cmake g++
+
+      - name: Criar pasta de build
+        run: mkdir build
+
+      - name: Rodar CMake
+        run: cmake -S . -B build
+
+      - name: Compilar projeto
+        run: cmake --build build
+
+      - name: Rodar testes
+        run: cd build && ctest --output-on-failure
