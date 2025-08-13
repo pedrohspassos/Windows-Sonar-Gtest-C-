@@ -28,7 +28,7 @@ jobs:
     - name: Gerar cobertura HTML e XML
       run: |
         cmake --build build --target coverage
-        cmake --build build --target coverage-xml
+      
 
     - name: Upload de relatórios
       uses: actions/upload-artifact@v4
