@@ -4,7 +4,6 @@ on:
   push:
     branches: [ workflow_teste_02 ]
 
-
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
@@ -12,25 +11,27 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Instalar gcovr
-      run: sudo apt-get update && sudo apt-get install -y gcovr
+    - name: Instalar dependências
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gcovr lcov g++ cmake
 
-    - name: Configurar CMake
-      run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
+    - name: Configurar CMake com cobertura
+      run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCODE_COVERAGE=ON
 
-    - name: Build
+    - name: Compilar
       run: cmake --build build
 
-    - name: Rodar testes
+    - name: Executar testes
       run: ctest --test-dir build --output-on-failure
 
-    - name: Gerar cobertura via alvo do CMake
-      run: cmake --build build --target coverage
+    - name: Gerar cobertura HTML e XML
+      run: |
+        cmake --build build --target coverage
+        cmake --build build --target coverage-xml
 
-    - name: Upload dos relatórios de cobertura como artefato
+    - name: Upload de relatórios
       uses: actions/upload-artifact@v4
       with:
-        name: cobertura-gcovr
-        path: |
-          build/coverage.html
-          build/coverage.xml
+        name: cobertura
+        path: build/coverage*

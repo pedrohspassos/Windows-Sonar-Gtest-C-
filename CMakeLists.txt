@@ -1,8 +1,9 @@
 cmake_minimum_required(VERSION 3.10)
-
 project(Calculator)
 
-# GoogleTest integration
+set(CMAKE_CXX_STANDARD 11)
+
+# GoogleTest
 include(FetchContent)
 FetchContent_Declare(
     googletest
@@ -11,36 +12,38 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
-set(CMAKE_CXX_STANDARD 11)
-
-# Flags de cobertura para GCC/Clang
+# Flags de cobertura
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-    add_compile_options(--coverage)
-    set(COVERAGE_LIBS --coverage)
+    add_compile_options(-O0 -g --coverage)
+    add_link_options(--coverage)
 endif()
 
 include_directories(include)
 
+# Biblioteca principal
 add_library(calculator src/calculator.cpp)
 
+# Executável principal
 add_executable(main src/main.cpp)
-target_link_libraries(main calculator ${COVERAGE_LIBS})
+target_link_libraries(main calculator)
 
+# Testes
 add_executable(test_calculator tests/test_calculator.cpp)
-target_link_libraries(test_calculator calculator gtest_main ${COVERAGE_LIBS})
+target_link_libraries(test_calculator calculator gtest_main)
 
 enable_testing()
 add_test(NAME CalculatorTests COMMAND test_calculator)
 
-# Alvo customizado para gerar cobertura
+# Alvo para cobertura
 add_custom_target(coverage
-    COMMAND ${CMAKE_COMMAND} -E env
-        gcovr
+    DEPENDS test_calculator
+    COMMAND ctest --output-on-failure
+    COMMAND gcovr
         -r ${CMAKE_SOURCE_DIR}
-        --exclude '.*_deps/.*'
-        --exclude '.*main\\.cpp'
-        --xml-pretty -o coverage.xml
-        --html --html-details -o coverage.html
+        --exclude 'tests/.*'
+        --exclude 'src/main.cpp'
+        --xml-pretty -o coverage/coverage.xml
+        --html --html-details -o coverage/coverage.html
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-    COMMENT "Gerando relatórios de cobertura com gcovr (HTML + XML)"
+    COMMENT "Gerando relatórios de cobertura com gcovr"
 )
