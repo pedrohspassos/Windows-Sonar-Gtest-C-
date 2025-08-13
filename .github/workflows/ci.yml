@@ -50,5 +50,5 @@ jobs:
         with:
           name: gcovr-coverage-report
           path: |
-            build/coverage.html
-            build/coverage.xml
+            coverage.html
+            coverage.xml
