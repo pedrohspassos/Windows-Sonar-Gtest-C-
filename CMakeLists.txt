@@ -42,8 +42,8 @@ add_custom_target(coverage
         -r ${CMAKE_SOURCE_DIR}
         --exclude 'tests/.*'
         --exclude 'src/main.cpp'
-        --xml-pretty -o coverage/coverage.xml
-        --html --html-details -o coverage/coverage.html
+        --xml-pretty -o coverage.xml
+        --html --html-details -o coverage.html
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     COMMENT "Gerando relatórios de cobertura com gcovr"
 )
