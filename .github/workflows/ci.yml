@@ -32,7 +32,6 @@ jobs:
 
       - name: Gerar relatório XML com gcovr
         run: |
-            cd build
             gcovr -r .. \
               --exclude '.*_deps/.*' \
               --exclude '.*main\.cpp' \
@@ -40,7 +39,6 @@ jobs:
 
       - name: Gerar relatório HTML com gcovr
         run: |
-          cd build
           gcovr -r .. \
             --exclude '.*_deps/.*' \
             --exclude '.*main\.cpp' \
