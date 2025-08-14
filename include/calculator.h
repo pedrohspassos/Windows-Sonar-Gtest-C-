@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CALCULATOR_H
+#define CALCULATOR_H
 
 class Calculator {
 public:
@@ -6,3 +7,5 @@ public:
     int subtract(int a, int b);
     int multiply(int a, int b);
 };
+
+#endif 
