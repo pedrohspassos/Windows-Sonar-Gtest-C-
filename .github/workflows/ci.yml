@@ -21,8 +21,8 @@ jobs:
       - name: Limpar build
         run: rm -rf build && mkdir build
 
-      - name: Rodar CMake com flags de cobertura
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
+        - name: Rodar CMake com flags de cobertura
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="--coverage" -DCMAKE_C_FLAGS="--coverage"
 
       - name: Compilar projeto
         run: cmake --build build
