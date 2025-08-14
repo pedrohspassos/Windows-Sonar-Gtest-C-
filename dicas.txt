@@ -1,0 +1,29 @@
+Ao compilar o código para gerar cobertura com ferramentas como gcovr, você precisa instruir o compilador a:
+
+Isso é feito com as flags:
+
+-g -O0 --coverage
+
+Ou seja, você deve incluir a flag --coverage tanto na compilação quanto no linking.
+
+Você precisa passar essas flags ao CMake. O ideal é adicionar isso na etapa:
+
+- name: Rodar CMake com flags de cobertura
+  run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="--coverage" -DCMAKE_C_FLAGS="--coverage"
+
+Se preferir manter a clareza, também pode adicionar as flags ao CMakeLists.txt do seu projeto, como:
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_compile_options(--coverage)
+    link_libraries(--coverage)
+endif()
+
+Flag	Função
+-g	Gera símbolos de debug (já incluso no Debug)
+-O0	Desativa otimizações (já incluso no Debug)
+--coverage	Ativa coleta de dados de cobertura via gcov
+
+------------------------------------------------------------------------------
+Aqui estava gerando coverage mesmo sem a tag. Ver porque
+
+- name: Rodar CMake com flags de cobertura run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug

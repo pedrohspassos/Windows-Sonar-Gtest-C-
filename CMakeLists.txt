@@ -28,10 +28,6 @@ add_library(calculator src/calculator.cpp)
 add_executable(main src/main.cpp)
 target_link_libraries(main calculator ${COVERAGE_LIBS})
 
-# Executável de teste
-add_executable(test_calculator tests/test_calculator.cpp)
-target_link_libraries(test_calculator calculator gtest_main ${COVERAGE_LIBS})
-
 # Testes
 enable_testing()
-add_test(NAME CalculatorTests COMMAND test_calculator)
+add_subdirectory(tests)
