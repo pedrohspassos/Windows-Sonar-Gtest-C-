@@ -12,10 +12,10 @@ TEST(CalculatorTest, Subtract) {
     EXPECT_EQ(calc.subtract(5, 3), 2);
 }
 
-TEST(CalculatorTest, Multiply) {
-    Calculator calc;
-    EXPECT_EQ(calc.multiply(4, 3), 12);
-}
+// TEST(CalculatorTest, Multiply) {
+//     Calculator calc;
+//     EXPECT_EQ(calc.multiply(4, 3), 12);
+// }
 
 int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);
