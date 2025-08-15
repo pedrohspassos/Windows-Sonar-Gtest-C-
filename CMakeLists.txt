@@ -4,7 +4,7 @@ project(Calculator)
 
 set(CMAKE_CXX_STANDARD 11)
 
-# Opção para ativar cobertura (usada apenas em GCC/Clang)
+# Opção para cobertura (só ativa para GCC/Clang)
 option(CODE_COVERAGE "Enable code coverage" OFF)
 
 if(CODE_COVERAGE)
@@ -12,12 +12,14 @@ if(CODE_COVERAGE)
     if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
         add_compile_options(--coverage)
         add_link_options(--coverage)
+    elseif(MSVC)
+        message(WARNING "Cobertura com MSVC será controlada externamente (ex: OpenCppCoverage)")
     else()
-        message(WARNING "Code coverage only supported with GCC or Clang")
+        message(WARNING "Code coverage not supported for this compiler.")
     endif()
 endif()
 
-# GoogleTest integration
+# GoogleTest
 include(FetchContent)
 FetchContent_Declare(
     googletest
@@ -28,7 +30,7 @@ FetchContent_MakeAvailable(googletest)
 
 include_directories(include)
 
-# Alvo da biblioteca
+# Biblioteca
 add_library(calculator src/calculator.cpp)
 
 # Executável principal
