@@ -3,7 +3,7 @@ name: C++ CI com MSVC e cobertura (OpenCppCoverage)
 on:
   workflow_dispatch:
   push:
-    branches: [ workflow_teste_02_att_msvc ]  # Ajuste conforme sua branch
+    branches: [ msvc-coverage ]  # Ajuste conforme sua branch
 
 jobs:
   build-and-test-msvc:
@@ -19,10 +19,10 @@ jobs:
       - name: Baixar e extrair OpenCppCoverage
         run: |
           curl -Lo OpenCppCoverage.zip https://github.com/OpenCppCoverage/OpenCppCoverage/releases/latest/download/OpenCppCoverage.zip
-          powershell -Command "Expand-Archive OpenCppCoverage.zip -DestinationPath ."
+          powershell -Command "Expand-Archive OpenCppCoverage.zip -DestinationPath OpenCppCoverageDir"
 
-      - name: Listar onde o OpenCppCoverage foi extraído (debug)
-        run: Get-ChildItem -Recurse -Filter OpenCppCoverage.exe
+      - name: Listar arquivos na pasta OpenCppCoverageDir (debug)
+        run: Get-ChildItem -Recurse -Path OpenCppCoverageDir
 
       - name: Configurar projeto com CMake
         run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
@@ -32,7 +32,7 @@ jobs:
 
       - name: Rodar testes com cobertura
         run: |
-          $coverageExe = Get-ChildItem -Recurse -Filter OpenCppCoverage.exe | Select-Object -First 1
+          $coverageExe = Get-ChildItem -Path OpenCppCoverageDir -Recurse -Filter OpenCppCoverage.exe | Select-Object -First 1
           if (-not $coverageExe) {
             Write-Error "OpenCppCoverage.exe não encontrado!"
             exit 1
