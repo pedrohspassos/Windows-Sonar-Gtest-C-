@@ -2,8 +2,7 @@ name: C++ CI com cobertura (gcovr)
 
 on:
   push:
-    branches: [ workflow_teste_02 ]   # Ajuste para sua branch de testes
-
+    branches: [ workflow_teste_02_att ]
 
 jobs:
   build-and-test:
@@ -18,14 +17,14 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y cmake g++ gcovr
 
-      - name: Limpar build
+      - name: Limpar e preparar build
         run: rm -rf build && mkdir build
 
-      - name: Rodar CMake com flags de cobertura
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
-
-      #- name: Rodar CMake com flags de cobertura
-      #run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="--coverage" -DCMAKE_C_FLAGS="--coverage"  
+      - name: Configurar CMake com suporte a cobertura
+        run: |
+          cmake -S . -B build \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DCODE_COVERAGE=ON
 
       - name: Compilar projeto
         run: cmake --build build
@@ -35,23 +34,24 @@ jobs:
 
       - name: Gerar relatório XML com gcovr
         run: |
-            gcovr -r .. \
-              --exclude '.*_deps/.*' \
-              --exclude '.*main\.cpp' \
-              --xml-pretty -o coverage.xml
+          cd build
+          gcovr -r .. \
+            --exclude '.*_deps/.*' \
+            --exclude '.*main\.cpp' \
+            --xml-pretty -o coverage.xml
 
       - name: Gerar relatório HTML com gcovr
         run: |
+          cd build
           gcovr -r .. \
             --exclude '.*_deps/.*' \
             --exclude '.*main\.cpp' \
             --html --html-details -o coverage.html
-
 
       - name: Upload do relatório como artefato
         uses: actions/upload-artifact@v4
         with:
           name: gcovr-coverage-report
           path: |
-            coverage.html
-            coverage.xml
+            build/coverage.html
+            build/coverage.xml
