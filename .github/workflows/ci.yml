@@ -20,8 +20,8 @@ jobs:
         run: |
           curl -Lo OpenCppCoverage.zip https://github.com/OpenCppCoverage/OpenCppCoverage/releases/latest/download/OpenCppCoverage.zip
           powershell -Command "Expand-Archive OpenCppCoverage.zip -DestinationPath ."
-          
-      - name: Verificar onde está o OpenCppCoverage.exe (debug)
+
+      - name: Listar onde o OpenCppCoverage foi extraído (debug)
         run: Get-ChildItem -Recurse -Filter OpenCppCoverage.exe
 
       - name: Configurar projeto com CMake
@@ -33,6 +33,11 @@ jobs:
       - name: Rodar testes com cobertura
         run: |
           $coverageExe = Get-ChildItem -Recurse -Filter OpenCppCoverage.exe | Select-Object -First 1
+          if (-not $coverageExe) {
+            Write-Error "OpenCppCoverage.exe não encontrado!"
+            exit 1
+          }
+
           & $coverageExe.FullName `
             --export_type cobertura:cobertura.xml `
             --modules build\Debug\* `
