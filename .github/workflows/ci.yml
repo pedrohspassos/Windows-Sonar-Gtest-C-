@@ -2,8 +2,7 @@ name: C++ CI com cobertura multiplataforma
 
 on:
   push:
-    branches: [ workflow_teste_02_att_msvc
-     ]
+    branches: [ workflow_teste_02_att_msvc ]
 
 jobs:
   build-linux:
@@ -15,7 +14,8 @@ jobs:
       - name: Instalar dependências
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake g++ gcovr
+          sudo apt-get install -y cmake g++ python3-pip
+          pip install --upgrade gcovr
 
       - name: Configurar CMake com cobertura
         run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCODE_COVERAGE=ON
@@ -70,9 +70,16 @@ jobs:
       - name: Compilar com MSVC
         run: cmake --build build --config Debug
 
-      - name: Rodar testes com cobertura
+      - name: Rodar testes com cobertura no Windows
         run: |
-          ./OpenCppCoverage/OpenCppCoverage.exe --export_type cobertura:cobertura.xml --modules build\\Debug\\* --sources src --sources include -- build\\Debug\\calculator_tests.exe
+          & "$PWD\OpenCppCoverage\OpenCppCoverage.exe" `
+            --export_type cobertura:cobertura.xml `
+            --modules build\Debug\* `
+            --sources src `
+            --sources include `
+            -- build\Debug\calculator_tests.exe
+        shell: pwsh
+
 
       - name: Upload do relatório (Windows)
         uses: actions/upload-artifact@v4
