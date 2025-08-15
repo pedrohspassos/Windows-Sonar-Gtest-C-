@@ -1,25 +1,26 @@
 cmake_minimum_required(VERSION 3.10)
-
 project(Calculator)
 
 set(CMAKE_CXX_STANDARD 11)
 
-# Opção para cobertura (só ativa para GCC/Clang)
 option(CODE_COVERAGE "Enable code coverage" OFF)
 
 if(CODE_COVERAGE)
     message(STATUS "Code coverage enabled")
-    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+        add_compile_options(-fprofile-instr-generate -fcoverage-mapping -g)
+        add_link_options(-fprofile-instr-generate)
+    elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
         add_compile_options(--coverage)
         add_link_options(--coverage)
     elseif(MSVC)
-        message(STATUS "MSVC detectado: cobertura será feita com OpenCppCoverage externamente.")
+        message(WARNING "Code coverage with MSVC must be done externally (e.g., OpenCppCoverage).")
     else()
         message(WARNING "Code coverage not supported for this compiler.")
     endif()
 endif()
 
-# GoogleTest
+# GoogleTest integration
 include(FetchContent)
 FetchContent_Declare(
     googletest
@@ -30,13 +31,9 @@ FetchContent_MakeAvailable(googletest)
 
 include_directories(include)
 
-# Biblioteca
 add_library(calculator src/calculator.cpp)
-
-# Executável principal
 add_executable(main src/main.cpp)
 target_link_libraries(main calculator)
 
-# Testes
 enable_testing()
 add_subdirectory(tests)

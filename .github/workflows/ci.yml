@@ -1,53 +1,49 @@
-name: C++ CI com MSVC e cobertura (OpenCppCoverage)
+name: C++ CI com cobertura multiplataforma (llvm-cov)
 
 on:
-  workflow_dispatch:
   push:
-    branches: [ msvc-coverage ]  # Ajuste conforme sua branch
+    branches: [workflow_teste_02_att_clang_linux]
+  workflow_dispatch:
 
 jobs:
-  build-and-test-msvc:
-    runs-on: windows-latest
+  build-and-test:
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
 
-      - name: Instalar CMake
-        uses: lukka/get-cmake@latest
-
-      - name: Baixar e extrair OpenCppCoverage
+      - name: Instalar dependências
         run: |
-          curl -Lo OpenCppCoverage.zip https://github.com/OpenCppCoverage/OpenCppCoverage/releases/latest/download/OpenCppCoverage.zip
-          powershell -Command "Expand-Archive OpenCppCoverage.zip -DestinationPath OpenCppCoverageDir"
+          sudo apt-get update
+          sudo apt-get install -y clang cmake llvm llvm-profdata llvm-cov lcov
 
-      - name: Listar arquivos na pasta OpenCppCoverageDir (debug)
-        run: Get-ChildItem -Recurse -Path OpenCppCoverageDir
+      - name: Configurar projeto com cobertura
+        run: cmake -S . -B build -DCODE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug
 
-      - name: Configurar projeto com CMake
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
+      - name: Compilar projeto
+        run: cmake --build build
 
-      - name: Compilar projeto com MSVC
-        run: cmake --build build --config Debug
-
-      - name: Rodar testes com cobertura
+      - name: Rodar testes e gerar dados de cobertura
         run: |
-          $coverageExe = Get-ChildItem -Path OpenCppCoverageDir -Recurse -Filter OpenCppCoverage.exe | Select-Object -First 1
-          if (-not $coverageExe) {
-            Write-Error "OpenCppCoverage.exe não encontrado!"
-            exit 1
-          }
+          LLVM_PROFILE_FILE="build/program.profraw" ./build/main
 
-          & $coverageExe.FullName `
-            --export_type cobertura:cobertura.xml `
-            --modules build\Debug\* `
-            --sources src `
-            --sources include `
-            -- build\Debug\calculator_tests.exe
-        shell: pwsh
+      - name: Gerar arquivo profdata
+        run: |
+          llvm-profdata merge -sparse build/program.profraw -o build/program.profdata
 
-      - name: Upload do relatório de cobertura
+      - name: Gerar relatório HTML
+        run: |
+          llvm-cov show ./build/main -instr-profile=build/program.profdata -format=html -output-dir=build/coverage-html
+
+      - name: Gerar relatório XML (Cobertura)
+        run: |
+          llvm-cov export ./build/main -instr-profile=build/program.profdata -format=cobertura > build/coverage.xml
+
+      - name: Upload dos relatórios
         uses: actions/upload-artifact@v4
         with:
-          name: cobertura-msvc
-          path: cobertura.xml
+          name: llvm-cov-coverage-report
+          path: |
+            build/coverage-html
+            build/coverage.xml
