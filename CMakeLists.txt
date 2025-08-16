@@ -38,3 +38,19 @@ target_link_libraries(main calculator)
 # Testes
 enable_testing()
 add_subdirectory(tests)
+
+
+# Target custom para gerar relatório de cobertura (e excluir)
+add_custom_target(coverage
+    COMMAND gcovr -r ${CMAKE_SOURCE_DIR}
+        --exclude '.*_deps/.*'
+        --exclude '.*main\.cpp'
+        --xml-pretty -o coverage.xml
+    COMMAND gcovr -r ${CMAKE_SOURCE_DIR}
+        --exclude '.*_deps/.*'
+        --exclude '.*main\.cpp'
+        --html --html-details -o coverage.html
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    COMMENT "Gerando relatório de cobertura com gcovr"
+    VERBATIM
+)

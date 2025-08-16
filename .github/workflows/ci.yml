@@ -32,21 +32,8 @@ jobs:
       - name: Rodar testes
         run: cd build && ctest --output-on-failure
 
-      - name: Gerar relatório XML com gcovr
-        run: |
-          cd build
-          gcovr -r .. \
-            --exclude '.*_deps/.*' \
-            --exclude '.*main\.cpp' \
-            --xml-pretty -o coverage.xml
-
-      - name: Gerar relatório HTML com gcovr
-        run: |
-          cd build
-          gcovr -r .. \
-            --exclude '.*_deps/.*' \
-            --exclude '.*main\.cpp' \
-            --html --html-details -o coverage.html
+      - name: Gerar relatório de cobertura
+        run: cmake --build build --target coverage
 
       - name: Upload do relatório como artefato
         uses: actions/upload-artifact@v4
