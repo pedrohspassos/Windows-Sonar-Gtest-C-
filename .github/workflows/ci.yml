@@ -37,7 +37,6 @@ jobs:
           cd build
           gcovr -r .. \
             --exclude '.*_deps/.*' \
-            --exclude '.*main\.cpp' \
             --xml-pretty -o coverage.xml
 
       - name: Gerar relatório HTML com gcovr
