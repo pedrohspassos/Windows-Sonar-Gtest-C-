@@ -44,7 +44,6 @@ jobs:
           cd build
           gcovr -r .. \
             --exclude '.*_deps/.*' \
-            --exclude '.*main\.cpp' \
             --html --html-details -o coverage.html
 
       - name: Upload do relatório como artefato
