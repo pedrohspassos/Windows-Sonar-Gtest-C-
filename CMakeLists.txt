@@ -49,7 +49,7 @@ add_custom_target(coverage
         --xml-pretty -o coverage.xml
     COMMAND gcovr -r ${CMAKE_SOURCE_DIR}
         --filter=${CMAKE_SOURCE_DIR}/src
-        --filter=${CMAKE_SOURCE_DIR}/tests
+        #--filter=${CMAKE_SOURCE_DIR}/tests
         --exclude=${CMAKE_SOURCE_DIR}/src/main.cpp
         --html --html-details -o coverage.html
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
