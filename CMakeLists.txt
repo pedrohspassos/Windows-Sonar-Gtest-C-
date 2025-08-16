@@ -43,11 +43,13 @@ add_subdirectory(tests)
 # Target custom para gerar relatório de cobertura (e excluir)
 add_custom_target(coverage
     COMMAND gcovr -r ${CMAKE_SOURCE_DIR}
-        --exclude '.*_deps/.*'
+        --filter ${CMAKE_SOURCE_DIR}/src
+        --filter ${CMAKE_SOURCE_DIR}/tests
         --exclude '.*main\.cpp'
         --xml-pretty -o coverage.xml
     COMMAND gcovr -r ${CMAKE_SOURCE_DIR}
-        --exclude '.*_deps/.*'
+        --filter ${CMAKE_SOURCE_DIR}/src
+        --filter ${CMAKE_SOURCE_DIR}/tests
         --exclude '.*main\.cpp'
         --html --html-details -o coverage.html
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
