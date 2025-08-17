@@ -2,7 +2,7 @@ name: C++ CI com cobertura (gcovr)
 
 on:
   push:
-    branches: [ workflow_teste_02_att ]
+    branches: [ ci/gcc-linux ]
 
 jobs:
   build-and-test:
