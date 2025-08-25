@@ -26,7 +26,7 @@ jobs:
 
       - name: Instalar gcovr
         shell: msys2 {0}
-        run: pip install --user gcovr
+        run: pacman -S --noconfirm mingw-w64-x86_64-python-gcovr
 
       - name: Limpar e preparar build
         shell: msys2 {0}
