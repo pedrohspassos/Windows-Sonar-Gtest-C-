@@ -1,46 +1,60 @@
-name: C++ CI (Windows + MinGW + gcovr)
+name: C++ CI com cobertura (mingw-w64)
 
 on:
   push:
-    branches: [ "ci/mingw-windows" ]
+    branches: [ ci/mingw-windows ]
+
 jobs:
-  build:
+  build-and-test:
     runs-on: windows-latest
 
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
 
-      - name: Instalar MSYS2
+      - name: Instalar MSYS2 e dependências
         uses: msys2/setup-msys2@v2
         with:
-          msystem: MINGW64
-          install: >-
+          update: true
+          install: >
             mingw-w64-x86_64-gcc
             mingw-w64-x86_64-make
             mingw-w64-x86_64-cmake
             mingw-w64-x86_64-python
-            mingw-w64-x86_64-gcovr
+          msystem: MINGW64
 
-      - name: Configurar build (CMake)
+      - name: Instalar gcovr via pip
+        shell: msys2 {0}
+        run: pip install gcovr
+
+      - name: Limpar e preparar build
+        shell: msys2 {0}
+        run: rm -rf build && mkdir build
+
+      - name: Configurar CMake com suporte a cobertura
         shell: msys2 {0}
         run: |
-          cmake -S . -B build -G "MinGW Makefiles" -DCODE_COVERAGE=ON
+          cmake -S . -B build \
+            -G "MinGW Makefiles" \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DCODE_COVERAGE=ON
 
       - name: Compilar projeto
         shell: msys2 {0}
         run: cmake --build build
 
-      - name: Executar testes
+      - name: Rodar testes
         shell: msys2 {0}
-        run: ctest --test-dir build --output-on-failure
+        run: cd build && ctest --output-on-failure
 
       - name: Gerar relatório de cobertura
         shell: msys2 {0}
         run: cmake --build build --target coverage
 
-      - name: Upload cobertura para artefatos
+      - name: Upload do relatório como artefato
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-report
-          path: build/coverage.*
+          name: gcovr-coverage-report
+          path: |
+            build/coverage.html
+            build/coverage.xml
