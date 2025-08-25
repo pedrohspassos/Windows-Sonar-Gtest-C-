@@ -21,12 +21,12 @@ jobs:
             mingw-w64-x86_64-make
             mingw-w64-x86_64-cmake
             mingw-w64-x86_64-python
+            mingw-w64-x86_64-python-pip
           msystem: MINGW64
 
       - name: Instalar gcovr
         shell: msys2 {0}
-        run: python -m pip install --user gcovr
-  
+        run: pip install --user gcovr
 
       - name: Limpar e preparar build
         shell: msys2 {0}
