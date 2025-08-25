@@ -24,6 +24,11 @@ jobs:
             mingw-w64-x86_64-python-pip
           msystem: MINGW64
 
+      - name: Instalar dependências Python nativas
+        shell: msys2 {0}
+        run: |
+          pacman -S --noconfirm mingw-w64-x86_64-libxml2 mingw-w64-x86_64-libxslt
+
       - name: Criar virtualenv e instalar gcovr
         shell: msys2 {0}
         run: |
