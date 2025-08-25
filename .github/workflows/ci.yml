@@ -28,9 +28,9 @@ jobs:
         shell: msys2 {0}
         run: |
           python -m venv venv
-          source venv/bin/activate
-          pip install --upgrade pip
-          pip install gcovr
+          venv/bin/python -m pip install --upgrade pip
+          venv/bin/python -m pip install gcovr
+
 
       - name: Limpar e preparar build
         shell: msys2 {0}
