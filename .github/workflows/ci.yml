@@ -20,28 +20,45 @@ jobs:
             mingw-w64-x86_64-gcc
             mingw-w64-x86_64-make
             mingw-w64-x86_64-cmake
-            mingw-w64-x86_64-gcovr
+            mingw-w64-ucrt-x86_64-python
           msystem: MINGW64
+
+      - name: Instalar gcovr via pip
+        shell: msys2 {0}
+        run: |
+          pacman -S --noconfirm mingw-w64-ucrt-x86_64-python-pip
+          python -m pip install --upgrade pip
+          python -m pip install gcovr
 
       - name: Limpar e preparar build
         shell: msys2 {0}
-        run: rm -rf build && mkdir build
+        run: |
+          rm -rf build
+          mkdir build
 
       - name: Configurar CMake com suporte a cobertura
         shell: msys2 {0}
-        run: cmake -S . -B build -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Debug -DCODE_COVERAGE=ON
+        run: |
+          cmake -S . -B build \
+            -G "MinGW Makefiles" \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DCODE_COVERAGE=ON
 
       - name: Compilar projeto
         shell: msys2 {0}
-        run: cmake --build build
+        run: |
+          cmake --build build
 
       - name: Rodar testes
         shell: msys2 {0}
-        run: cd build && ctest --output-on-failure
+        run: |
+          cd build && ctest --output-on-failure
 
       - name: Gerar relatório de cobertura
         shell: msys2 {0}
-        run: cmake --build build --target coverage
+        run: |
+          gcovr -r . --html -o build/coverage.html
+          gcovr -r . --xml -o build/coverage.xml
 
       - name: Upload do relatório como artefato
         uses: actions/upload-artifact@v4
