@@ -28,7 +28,7 @@ jobs:
         shell: msys2 {0}
         run: |
           python -m venv venv
-          source venv/Scripts/activate
+          source venv/bin/activate
           pip install --upgrade pip
           pip install gcovr
 
@@ -39,7 +39,7 @@ jobs:
       - name: Configurar CMake com suporte a cobertura
         shell: msys2 {0}
         run: |
-          source venv/Scripts/activate
+          source venv/bin/activate
           cmake -S . -B build \
             -G "MinGW Makefiles" \
             -DCMAKE_BUILD_TYPE=Debug \
@@ -48,19 +48,19 @@ jobs:
       - name: Compilar projeto
         shell: msys2 {0}
         run: |
-          source venv/Scripts/activate
+          source venv/bin/activate
           cmake --build build
 
       - name: Rodar testes
         shell: msys2 {0}
         run: |
-          source venv/Scripts/activate
+          source venv/bin/activate
           cd build && ctest --output-on-failure
 
       - name: Gerar relatório de cobertura
         shell: msys2 {0}
         run: |
-          source venv/Scripts/activate
+          source venv/bin/activate
           cmake --build build --target coverage
 
       - name: Upload do relatório como artefato
