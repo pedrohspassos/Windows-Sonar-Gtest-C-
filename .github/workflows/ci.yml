@@ -20,22 +20,8 @@ jobs:
             mingw-w64-x86_64-gcc
             mingw-w64-x86_64-make
             mingw-w64-x86_64-cmake
-            mingw-w64-x86_64-python
-            mingw-w64-x86_64-python-pip
+            mingw-w64-x86_64-gcovr
           msystem: MINGW64
-
-      - name: Instalar dependências Python nativas
-        shell: msys2 {0}
-        run: |
-          pacman -S --noconfirm mingw-w64-x86_64-libxml2 mingw-w64-x86_64-libxslt
-
-      - name: Criar virtualenv e instalar gcovr
-        shell: msys2 {0}
-        run: |
-          python -m venv venv
-          venv/bin/python -m pip install --upgrade pip
-          venv/bin/python -m pip install gcovr
-
 
       - name: Limpar e preparar build
         shell: msys2 {0}
@@ -43,30 +29,19 @@ jobs:
 
       - name: Configurar CMake com suporte a cobertura
         shell: msys2 {0}
-        run: |
-          source venv/bin/activate
-          cmake -S . -B build \
-            -G "MinGW Makefiles" \
-            -DCMAKE_BUILD_TYPE=Debug \
-            -DCODE_COVERAGE=ON
+        run: cmake -S . -B build -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Debug -DCODE_COVERAGE=ON
 
       - name: Compilar projeto
         shell: msys2 {0}
-        run: |
-          source venv/bin/activate
-          cmake --build build
+        run: cmake --build build
 
       - name: Rodar testes
         shell: msys2 {0}
-        run: |
-          source venv/bin/activate
-          cd build && ctest --output-on-failure
+        run: cd build && ctest --output-on-failure
 
       - name: Gerar relatório de cobertura
         shell: msys2 {0}
-        run: |
-          source venv/bin/activate
-          cmake --build build --target coverage
+        run: cmake --build build --target coverage
 
       - name: Upload do relatório como artefato
         uses: actions/upload-artifact@v4
