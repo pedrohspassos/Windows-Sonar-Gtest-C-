@@ -1,44 +1,46 @@
-name: C++ CI com cobertura (gcovr)
+name: C++ CI (Windows + MinGW + gcovr)
 
 on:
   push:
-    branches: [ ci/gcc-linux ]
-
+    branches: [ "ci/mingw-windows" ]
 jobs:
-  build-and-test:
-    runs-on: ubuntu-latest
+  build:
+    runs-on: windows-latest
 
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
 
-      - name: Instalar dependências
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y cmake g++ gcovr
+      - name: Instalar MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          install: >-
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-make
+            mingw-w64-x86_64-cmake
+            mingw-w64-x86_64-python
+            mingw-w64-x86_64-gcovr
 
-      - name: Limpar e preparar build
-        run: rm -rf build && mkdir build
-
-      - name: Configurar CMake com suporte a cobertura
+      - name: Configurar build (CMake)
+        shell: msys2 {0}
         run: |
-          cmake -S . -B build \
-            -DCMAKE_BUILD_TYPE=Debug \
-            -DCODE_COVERAGE=ON
+          cmake -S . -B build -G "MinGW Makefiles" -DCODE_COVERAGE=ON
 
       - name: Compilar projeto
+        shell: msys2 {0}
         run: cmake --build build
 
-      - name: Rodar testes
-        run: cd build && ctest --output-on-failure
+      - name: Executar testes
+        shell: msys2 {0}
+        run: ctest --test-dir build --output-on-failure
 
       - name: Gerar relatório de cobertura
+        shell: msys2 {0}
         run: cmake --build build --target coverage
 
-      - name: Upload do relatório como artefato
+      - name: Upload cobertura para artefatos
         uses: actions/upload-artifact@v4
         with:
-          name: gcovr-coverage-report
-          path: |
-            build/coverage.html
-            build/coverage.xml
+          name: coverage-report
+          path: build/coverage.*
